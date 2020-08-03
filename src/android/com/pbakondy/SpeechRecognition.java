@@ -301,7 +301,7 @@ public class SpeechRecognition extends CordovaPlugin {
             if(matches.size() > 0){
               mLastPartialResults = matchesJSON;
             }
-          PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, matchesJSON);
+          PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, mLastPartialResults);
           pluginResult.setKeepCallback(true);
           callbackContext.sendPluginResult(pluginResult);
         }
