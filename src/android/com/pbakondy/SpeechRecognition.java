@@ -115,7 +115,7 @@ public class SpeechRecognition extends CordovaPlugin {
         mLastPartialResults = new JSONArray();
         Boolean showPartial = args.optBoolean(3, false);
         Boolean showPopup = args.optBoolean(4, true);
-        startListening(lang, matches, prompt,showPartial, showPopup);
+        startListening(lang, matches, prompt, showPartial, showPopup);
 
         return true;
       }
@@ -125,7 +125,7 @@ public class SpeechRecognition extends CordovaPlugin {
         view.post(new Runnable() {
           @Override
           public void run() {
-            if(recognizer != null) {
+            if (recognizer != null) {
               recognizer.stopListening();
             }
             callbackContextStop.success();
@@ -161,16 +161,16 @@ public class SpeechRecognition extends CordovaPlugin {
     return SpeechRecognizer.isRecognitionAvailable(context);
   }
 
-  private void startListening(String language, int matches, String prompt, final Boolean showPartial, Boolean showPopup) {
-    Log.d(LOG_TAG, "startListening() language: " + language + ", matches: " + matches + ", prompt: " + prompt + ", showPartial: " + showPartial + ", showPopup: " + showPopup);
+  private void startListening(String language, int matches, String prompt, final Boolean showPartial,
+      Boolean showPopup) {
+    Log.d(LOG_TAG, "startListening() language: " + language + ", matches: " + matches + ", prompt: " + prompt
+        + ", showPartial: " + showPartial + ", showPopup: " + showPopup);
 
     final Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-    intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-            RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+    intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
     intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, language);
     intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, matches);
-    intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE,
-            activity.getPackageName());
+    intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, activity.getPackageName());
     intent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, showPartial);
     intent.putExtra("android.speech.extra.DICTATION_MODE", showPartial);
 
@@ -231,7 +231,8 @@ public class SpeechRecognition extends CordovaPlugin {
   }
 
   @Override
-  public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults) throws JSONException {
+  public void onRequestPermissionResult(int requestCode, String[] permissions, int[] grantResults)
+      throws JSONException {
     if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
       this.callbackContext.success();
     } else {
@@ -262,7 +263,6 @@ public class SpeechRecognition extends CordovaPlugin {
     super.onActivityResult(requestCode, resultCode, data);
   }
 
-
   private class SpeechRecognitionListener implements RecognitionListener {
 
     @Override
@@ -275,6 +275,7 @@ public class SpeechRecognition extends CordovaPlugin {
 
     @Override
     public void onEndOfSpeech() {
+      Log.d(LOG_TAG, "onEndOfSpeech");
     }
 
     @Override
@@ -294,10 +295,12 @@ public class SpeechRecognition extends CordovaPlugin {
       Log.d(LOG_TAG, "SpeechRecognitionListener partialResults: " + matches);
       JSONArray matchesJSON = new JSONArray(matches);
       try {
-        if (matches != null
-                && matches.size() > 0
-                        && !mLastPartialResults.equals(matchesJSON)) {
-          mLastPartialResults = matchesJSON;
+        // if (matches != null && matches.size() > 0 && !mLastPartialResults.equals(matchesJSON)) {
+          // fix: always call js callback, if empty use last;
+          if(matches != null){
+            if(matches.size() > 0){
+              mLastPartialResults = matchesJSON;
+            }
           PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, matchesJSON);
           pluginResult.setKeepCallback(true);
           callbackContext.sendPluginResult(pluginResult);
