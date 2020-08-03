@@ -77,6 +77,7 @@
         // Cancel the previous task if it's running.
         if ( self.recognitionTask ) {
             [self.recognitionTask cancel];
+            [self.recognitionTask finish];
             self.recognitionTask = nil;
         }
 
@@ -161,6 +162,12 @@
         if ( self.audioEngine.isRunning ) {
             [self.audioEngine stop];
             [self.recognitionRequest endAudio];
+        }
+
+        if ( self.recognitionTask ) {
+            [self.recognitionTask cancel];
+            [self.recognitionTask finish];
+            self.recognitionTask = nil;
         }
 
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
