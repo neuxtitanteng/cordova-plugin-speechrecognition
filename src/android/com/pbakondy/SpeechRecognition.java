@@ -293,14 +293,20 @@ public class SpeechRecognition extends CordovaPlugin {
     public void onPartialResults(Bundle bundle) {
       ArrayList<String> matches = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
       Log.d(LOG_TAG, "SpeechRecognitionListener partialResults: " + matches);
+      Log.d(LOG_TAG, "SpeechRecognitionListener partialResults matches size: " + matches.size());
       JSONArray matchesJSON = new JSONArray(matches);
       try {
         // if (matches != null && matches.size() > 0 && !mLastPartialResults.equals(matchesJSON)) {
           // fix: always call js callback, if empty use last;
           if(matches != null){
-            if(matches.size() > 0){
+            if(
+              matches.size() > 0 &&
+               ((mLastPartialResults.length() > 0 && !matchesJSON.getString(0).isEmpty())|| mLastPartialResults.length() == 0 )
+              ){
               mLastPartialResults = matchesJSON;
+              Log.d(LOG_TAG, "SpeechRecognitionListener partialResults matches.size() >0 :"+mLastPartialResults);
             }
+            Log.d(LOG_TAG, "SpeechRecognitionListener partialResults mLastPartialResults:"+mLastPartialResults);
           PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, mLastPartialResults);
           pluginResult.setKeepCallback(true);
           callbackContext.sendPluginResult(pluginResult);
